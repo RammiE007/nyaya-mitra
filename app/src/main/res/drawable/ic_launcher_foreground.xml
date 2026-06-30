@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- AI Neural Network Circuit Lines (Background) -->
+    <path
+        android:strokeWidth="1.5"
+        android:strokeColor="#FFD54F"
+        android:strokeAlpha="0.4"
+        android:fillColor="#00000000"
+        android:pathData="M54,14 L28,22 M54,14 L80,22 M28,22 L38,44 M80,22 L70,44 M38,44 L54,54 M70,44 L54,54" />
+
+    <!-- AI Neural Network Nodes -->
+    <path
+        android:fillColor="#FFD54F"
+        android:fillAlpha="0.8"
+        android:pathData="M54,14m-3,0a3,3 0 1,1 6,0a3,3 0 1,1 -6,0
+                          M28,22m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0
+                          M80,22m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0
+                          M38,44m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0
+                          M70,44m-2.5,0a2.5,2.5 0 1,1 5,0a2.5,2.5 0 1,1 -5,0" />
+
+    <!-- Scales of Justice (Foreground) -->
+    <!-- Central Pillar -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M42,78 h24 v4 h-24 z
+                          M52,28 h4 v50 h-4 z
+                          M54,22 m-3,0 a3,3 0 1,1 6,0 a3,3 0 1,1 -6,0" />
+
+    <!-- Main Balanced Beam -->
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M24,30 h60 v3 h-60 z" />
+
+    <!-- Left Scale Pan and Hangers -->
+    <path
+        android:strokeWidth="1.2"
+        android:strokeColor="#FFFFFF"
+        android:fillColor="#00000000"
+        android:pathData="M28,31 L16,52 M28,31 L40,52" />
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M16,52 h24 c0,5 -24,5 -24,0 z" />
+
+    <!-- Right Scale Pan and Hangers -->
+    <path
+        android:strokeWidth="1.2"
+        android:strokeColor="#FFFFFF"
+        android:fillColor="#00000000"
+        android:pathData="M80,31 L68,52 M80,31 L92,52" />
+    <path
+        android:fillColor="#FFC107"
+        android:pathData="M68,52 h24 c0,5 -24,5 -24,0 z" />
+
+</vector>

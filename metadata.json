@@ -1,0 +1,6 @@
+{
+  "name": "AI Legal Helper",
+  "description": "Bilingual (Hindi + English) AI legal explainer, IPC/BNS converter, document analyzer, and lawyer connector for India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
