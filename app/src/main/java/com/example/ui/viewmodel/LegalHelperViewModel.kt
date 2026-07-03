@@ -91,7 +91,191 @@ class LegalHelperViewModel(
     private val _remainingFreeDocs = MutableStateFlow(1)
     val remainingFreeDocs: StateFlow<Int> = _remainingFreeDocs.asStateFlow()
 
+    // --- Onboarding / Tour State ---
+    private val _showOnboarding = MutableStateFlow(true)
+    val showOnboarding: StateFlow<Boolean> = _showOnboarding.asStateFlow()
+
+    private val _currentOnboardingStep = MutableStateFlow(0)
+    val currentOnboardingStep: StateFlow<Int> = _currentOnboardingStep.asStateFlow()
+
+    fun startOnboarding() {
+        _currentOnboardingStep.value = 0
+        _showOnboarding.value = true
+    }
+
+    fun completeOnboarding() {
+        _showOnboarding.value = false
+    }
+
+    fun nextOnboardingStep() {
+        _currentOnboardingStep.value = _currentOnboardingStep.value + 1
+    }
+
+    fun prevOnboardingStep() {
+        _currentOnboardingStep.value = (_currentOnboardingStep.value - 1).coerceAtLeast(0)
+    }
+
+    // --- Dual-Role Multi-Language & Auth State ---
+    private val _userRole = MutableStateFlow("client") // "client", "lawyer", "admin"
+    val userRole: StateFlow<String> = _userRole.asStateFlow()
+
+    private val _currentLanguage = MutableStateFlow("en") // "hi", "en"
+    val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
+
+    private val _phoneInput = MutableStateFlow("")
+    val phoneInput: StateFlow<String> = _phoneInput.asStateFlow()
+
+    private val _otpInput = MutableStateFlow("")
+    val otpInput: StateFlow<String> = _otpInput.asStateFlow()
+
+    private val _isRegistered = MutableStateFlow(false)
+    val isRegistered: StateFlow<Boolean> = _isRegistered.asStateFlow()
+
+    // --- Lawyer Profile & Onboarding ---
+    private val _lawyerVerificationStatus = MutableStateFlow("none") // "none", "pending", "verified", "rejected"
+    val lawyerVerificationStatus: StateFlow<String> = _lawyerVerificationStatus.asStateFlow()
+
+    val lawyerName = MutableStateFlow("")
+    val lawyerEmail = MutableStateFlow("")
+    val lawyerBarState = MutableStateFlow("Delhi Bar Council")
+    val lawyerEnrollmentNo = MutableStateFlow("")
+    val lawyerEnrollmentYear = MutableStateFlow("2018")
+    val lawyerExperience = MutableStateFlow("5")
+    val lawyerPracticeAreas = MutableStateFlow(setOf("Criminal", "Civil"))
+    val lawyerFees = MutableStateFlow(mapOf("chat" to "299", "call" to "499", "video" to "599"))
+    val lawyerBio = MutableStateFlow("")
+    val lawyerBankName = MutableStateFlow("")
+    val lawyerAccountNo = MutableStateFlow("")
+    val lawyerIfsc = MutableStateFlow("")
+    val lawyerListingPlan = MutableStateFlow("Free")
+
+    private val _lawyerIsOnline = MutableStateFlow(true)
+    val lawyerIsOnline: StateFlow<Boolean> = _lawyerIsOnline.asStateFlow()
+
+    // Leads list
+    private val _lawyerLeads = MutableStateFlow<List<LawyerLead>>(
+        listOf(
+            LawyerLead(
+                id = "LD-4821",
+                clientName = "Anonymous Client",
+                caseType = "Criminal Case",
+                aiSummary = "BNS §74 (old IPC §354) FIR darz hui hai Hazratganj PS Lucknow mein. Client ko bail aur agla process samajhna hai.",
+                applicableSection = "BNS §74 (IPC §354)",
+                bailableStatus = "Non-Bailable",
+                consultType = "Chat Consult",
+                fee = "₹299",
+                timeReceived = "15 mins ago"
+            ),
+            LawyerLead(
+                id = "LD-9204",
+                clientName = "Suresh K. (Small Business)",
+                caseType = "Contract Notice",
+                aiSummary = "Vendor has sent legal notice for non-payment of ₹2,50,000. Under Section 138 of Negotiable Instruments Act. Client has check receipts.",
+                applicableSection = "NI Act §138",
+                bailableStatus = "Bailable",
+                consultType = "Phone Call",
+                fee = "₹499",
+                timeReceived = "1 hr ago"
+            )
+        )
+    )
+    val lawyerLeads: StateFlow<List<LawyerLead>> = _lawyerLeads.asStateFlow()
+
+    private val _lawyerEarnings = MutableStateFlow(0.0)
+    val lawyerEarnings: StateFlow<Double> = _lawyerEarnings.asStateFlow()
+
+    private val _lawyerRatingAvg = MutableStateFlow(4.8)
+    val lawyerRatingAvg: StateFlow<Double> = _lawyerRatingAvg.asStateFlow()
+
+    private val _lawyerReviewCount = MutableStateFlow(12)
+    val lawyerReviewCount: StateFlow<Int> = _lawyerReviewCount.asStateFlow()
+
+    private val _lawyerAcceptedConsultations = MutableStateFlow<List<LawyerLead>>(emptyList())
+    val lawyerAcceptedConsultations: StateFlow<List<LawyerLead>> = _lawyerAcceptedConsultations.asStateFlow()
+
+    val lawyerSlots = MutableStateFlow(
+        mapOf(
+            "Monday" to listOf("09:00 AM - 01:00 PM", "02:00 PM - 06:00 PM"),
+            "Tuesday" to listOf("10:00 AM - 05:00 PM"),
+            "Wednesday" to listOf("Court Day - Unavailable"),
+            "Thursday" to listOf("11:00 AM - 07:00 PM"),
+            "Friday" to listOf("09:00 AM - 03:00 PM"),
+            "Saturday" to listOf("10:00 AM - 01:00 PM")
+        )
+    )
+
     // --- Actions ---
+
+    fun selectLanguage(lang: String) {
+        _currentLanguage.value = lang
+    }
+
+    fun selectRole(role: String) {
+        _userRole.value = role
+    }
+
+    fun updatePhoneInput(phone: String) {
+        _phoneInput.value = phone
+    }
+
+    fun updateOtpInput(otp: String) {
+        _otpInput.value = otp
+    }
+
+    fun verifyOTP() {
+        if (_phoneInput.value.isNotEmpty() && _otpInput.value.length == 6) {
+            _isRegistered.value = true
+        }
+    }
+
+    fun logout() {
+        _isRegistered.value = false
+        _phoneInput.value = ""
+        _otpInput.value = ""
+        _lawyerVerificationStatus.value = "none"
+        _userRole.value = "client"
+    }
+
+    fun registerClient(name: String, city: String, state: String) {
+        _isRegistered.value = true
+    }
+
+    fun registerLawyerSubmit() {
+        _lawyerVerificationStatus.value = "pending"
+    }
+
+    fun setLawyerOnline(isOnline: Boolean) {
+        _lawyerIsOnline.value = isOnline
+    }
+
+    fun acceptLead(leadId: String) {
+        val currentList = _lawyerLeads.value
+        val lead = currentList.find { it.id == leadId }
+        if (lead != null) {
+            val updatedLead = lead.copy(status = "Accepted")
+            _lawyerLeads.value = currentList.map { if (it.id == leadId) updatedLead else it }
+            _lawyerAcceptedConsultations.value = _lawyerAcceptedConsultations.value + updatedLead
+            val numericFee = lead.fee.replace("₹", "").trim().toDoubleOrNull() ?: 0.0
+            _lawyerEarnings.value = _lawyerEarnings.value + numericFee
+        }
+    }
+
+    fun declineLead(leadId: String) {
+        val currentList = _lawyerLeads.value
+        val lead = currentList.find { it.id == leadId }
+        if (lead != null) {
+            val updatedLead = lead.copy(status = "Declined")
+            _lawyerLeads.value = currentList.map { if (it.id == leadId) updatedLead else it }
+        }
+    }
+
+    fun adminApproveLawyer() {
+        _lawyerVerificationStatus.value = "verified"
+    }
+
+    fun adminRejectLawyer() {
+        _lawyerVerificationStatus.value = "rejected"
+    }
 
     fun upgradeToPro() {
         _isPro.value = true
@@ -294,3 +478,17 @@ fun String.fromJsonArray(): List<String> {
     }
     return list
 }
+
+data class LawyerLead(
+    val id: String,
+    val clientName: String,
+    val caseType: String,
+    val aiSummary: String,
+    val applicableSection: String,
+    val bailableStatus: String,
+    val consultType: String,
+    val fee: String,
+    val timeReceived: String,
+    val status: String = "Pending"
+)
+

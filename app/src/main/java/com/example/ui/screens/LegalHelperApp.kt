@@ -38,7 +38,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Description
@@ -48,6 +49,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -179,13 +181,60 @@ fun LegalHelperApp(viewModel: LegalHelperViewModel) {
     val viewingQuery by viewModel.viewingQuery.collectAsState()
     val viewingDoc by viewModel.viewingDoc.collectAsState()
 
+    val showOnboarding by viewModel.showOnboarding.collectAsState()
+    val currentOnboardingStep by viewModel.currentOnboardingStep.collectAsState()
+
     // Helper navigate functions to handle back stack simply
     fun navigateTo(screen: AppScreen) {
         previousScreen = currentScreen
         currentScreen = screen
     }
 
-    Scaffold(
+    val isRegistered by viewModel.isRegistered.collectAsState()
+    val userRole by viewModel.userRole.collectAsState()
+    val lawyerVerificationStatus by viewModel.lawyerVerificationStatus.collectAsState()
+    var showAdminPanel by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (!isRegistered) {
+            AuthEntryScreen(viewModel = viewModel)
+            Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.BottomEnd) {
+                FloatingActionButton(
+                    onClick = { showAdminPanel = true },
+                    containerColor = AccentSaffron,
+                    modifier = Modifier.testTag("admin_fab")
+                ) {
+                    Icon(Icons.Default.Build, contentDescription = "Sandbox Panel")
+                }
+            }
+            if (showAdminPanel) {
+                AdminControlPanelScreen(viewModel = viewModel, onDismiss = { showAdminPanel = false })
+            }
+        } else if (userRole == "lawyer") {
+            val hasSubmittedProfile by viewModel.lawyerEnrollmentNo.collectAsState()
+            if (hasSubmittedProfile.isEmpty()) {
+                LawyerOnboardingScreen(viewModel = viewModel)
+            } else {
+                when (lawyerVerificationStatus) {
+                    "Pending" -> LawyerVerificationPendingScreen(viewModel = viewModel)
+                    "Rejected" -> LawyerVerificationRejectedScreen(viewModel = viewModel)
+                    "Approved" -> LawyerDashboardScreen(viewModel = viewModel)
+                }
+            }
+            Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.BottomEnd) {
+                FloatingActionButton(
+                    onClick = { showAdminPanel = true },
+                    containerColor = AccentSaffron,
+                    modifier = Modifier.testTag("admin_fab")
+                ) {
+                    Icon(Icons.Default.Build, contentDescription = "Sandbox Panel")
+                }
+            }
+            if (showAdminPanel) {
+                AdminControlPanelScreen(viewModel = viewModel, onDismiss = { showAdminPanel = false })
+            }
+        } else {
+            Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -227,6 +276,35 @@ fun LegalHelperApp(viewModel: LegalHelperViewModel) {
                     }
                 },
                 actions = {
+                    val currentLang by viewModel.currentLanguage.collectAsState()
+                    TextButton(
+                        onClick = {
+                            val nextLang = if (currentLang == "hi") "en" else "hi"
+                            viewModel.selectLanguage(nextLang)
+                        },
+                        modifier = Modifier.padding(end = 4.dp).testTag("language_toggle_btn")
+                    ) {
+                        Text(
+                            text = if (currentLang == "hi") "English" else "हिन्दी",
+                            fontWeight = FontWeight.Bold,
+                            color = TrustNavy,
+                            fontSize = 13.sp
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { viewModel.startOnboarding() },
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .testTag("onboarding_tour_replay_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Help,
+                            contentDescription = "Help Tour",
+                            tint = TextGray
+                        )
+                    }
+
                     if (isPro) {
                         Surface(
                             color = AccentSaffron,
@@ -440,6 +518,18 @@ fun LegalHelperApp(viewModel: LegalHelperViewModel) {
                         viewModel.upgradeToPro()
                         showPaywall = false
                     }
+                )
+            }
+        }
+    }
+
+            if (showOnboarding) {
+                OnboardingTourOverlay(
+                    step = currentOnboardingStep,
+                    onNext = { viewModel.nextOnboardingStep() },
+                    onPrev = { viewModel.prevOnboardingStep() },
+                    onSkip = { viewModel.completeOnboarding() },
+                    onFinish = { viewModel.completeOnboarding() }
                 )
             }
         }
